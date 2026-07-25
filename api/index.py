@@ -286,6 +286,78 @@ GRADER_SYSTEM_PROMPT = (
 )
 
 
+
+# ---------------------------------------------------------------------------
+# DISTRIBUTED RATE LIMITER (Upstash Redis, optional — no-op if not configured)
+#
+# Cerebras's free tier is ~5 requests/minute, SHARED across every employee
+# hitting this app at once, not per-user. A stateless Vercel function can't
+# coordinate that on its own — two people submitting at the same moment run
+# in two separate function instances with no shared memory. This uses
+# Upstash Redis's plain REST API (just `requests`, no extra package) as the
+# one piece of shared state everyone's requests check against.
+#
+# Setup (one click, inside Vercel itself, no separate signup):
+#   Vercel project -> Storage tab -> Create Database -> Upstash Redis (free)
+#   -> Connect to this project. Vercel auto-injects either:
+#     UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN, or
+#     KV_REST_API_URL / KV_REST_API_TOKEN
+#   This checks for both names. If neither is set, every call below is a
+#   safe no-op and the app works exactly as before (just without
+#   cross-request protection).
+# ---------------------------------------------------------------------------
+
+CEREBRAS_SAFE_RPM = 4  # stay under Cerebras's ~5 req/min free-tier cap, leave a margin
+RATE_WINDOW_SECONDS = 60
+RATE_KEY = "examapp:cerebras_rpm"
+
+
+def _redis_config():
+    url = os.environ.get("UPSTASH_REDIS_REST_URL") or os.environ.get("KV_REST_API_URL")
+    token = os.environ.get("UPSTASH_REDIS_REST_TOKEN") or os.environ.get("KV_REST_API_TOKEN")
+    if url and token:
+        return url.rstrip("/"), token
+    return None, None
+
+
+def _redis_get(url, token, path):
+    resp = requests.get(f"{url}/{path}", headers={"Authorization": f"Bearer {token}"}, timeout=5)
+    resp.raise_for_status()
+    return resp.json().get("result")
+
+
+def acquire_cerebras_slot(max_wait_seconds: int = 90) -> bool:
+    """Blocks (sleeping) until it's safe to make one Cerebras call, using a shared
+    Redis counter that resets every RATE_WINDOW_SECONDS. Returns True once a slot
+    is acquired (or immediately if Redis isn't configured), or False if
+    max_wait_seconds elapses first — the caller still attempts the call either
+    way, since the per-call 429 retry is the final safety net."""
+    url, token = _redis_config()
+    if not url:
+        return True
+
+    deadline = time.time() + max_wait_seconds
+    while time.time() < deadline:
+        try:
+            current = _redis_get(url, token, f"get/{RATE_KEY}")
+            current = int(current) if current is not None else 0
+
+            if current < CEREBRAS_SAFE_RPM:
+                new_val = _redis_get(url, token, f"incr/{RATE_KEY}")
+                if int(new_val) == 1:
+                    _redis_get(url, token, f"expire/{RATE_KEY}/{RATE_WINDOW_SECONDS}")
+                return True
+
+            ttl = _redis_get(url, token, f"ttl/{RATE_KEY}")
+            wait_for = (int(ttl) + 1) if (ttl and int(ttl) > 0) else 12
+            wait_for = min(wait_for, max(1, deadline - time.time()))
+            time.sleep(wait_for)
+        except requests.RequestException:
+            return True  # Redis unreachable this attempt — don't block grading entirely
+
+    return False
+
+
 def _grade_practical(task: dict, submitted_text: str, max_retries: int = 4) -> dict:
     submitted_text = (submitted_text or "").strip()
     if not submitted_text:
@@ -305,6 +377,7 @@ def _grade_practical(task: dict, submitted_text: str, max_retries: int = 4) -> d
     last_error = None
     for attempt in range(max_retries):
         try:
+            acquire_cerebras_slot()
             resp = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[
