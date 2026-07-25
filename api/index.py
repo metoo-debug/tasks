@@ -971,7 +971,16 @@ def _push_to_sheet(result: dict) -> str:
     try:
         resp = requests.post(SHEET_WEBHOOK_URL, json=row, timeout=15)
         if resp.status_code == 200:
-            return "ok"
-        return f"sheet_error_{resp.status_code}"
+            # Apps Script can return HTTP 200 with an HTML "authorization required" or
+            # error page instead of our expected JSON — catch that case too, not just
+            # non-200 statuses, since a silent 200 would otherwise look like success.
+            try:
+                body = resp.json()
+                if body.get("status") == "ok":
+                    return "ok"
+                return f"sheet_error_unexpected_response_{str(body)[:150]}"
+            except ValueError:
+                return f"sheet_error_non_json_200_{resp.text[:150]}"
+        return f"sheet_error_{resp.status_code}_{resp.text[:150]}"
     except requests.RequestException as exc:
         return f"sheet_error_{exc}"
