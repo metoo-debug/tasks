@@ -28,230 +28,343 @@ from langgraph.graph import StateGraph, START, END
 
 MCQS = [
     {
-        "id": "m1", "type": "mcq", "source": "AI Dev Bible",
-        "question": "Put the four-step agent loop in the order every serious AI coding tool follows:",
-        "options": ["Write → Plan → Ship → Verify", "Plan → Write → Verify → Ship",
-                    "Verify → Plan → Write → Ship", "Plan → Verify → Write → Ship"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m2", "type": "mcq", "source": "AI Dev Bible",
-        "question": "A model confidently stating a package name that doesn't actually exist is best described as:",
-        "options": ["A prompt error", "A hallucination", "A context window overflow", "A token limit issue"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m3", "type": "mcq", "source": "AI Dev Bible",
-        "question": "What is CLAUDE.md for?",
-        "options": ["A changelog of every past session",
-                    "A file read automatically at the start of every session so stack/conventions don't need repeating",
-                    "A list of banned commands", "The project's README for end users"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m4", "type": "mcq", "source": "AI Dev Bible",
-        "question": "Which of these is NOT one of the five ingredients of a strong prompt?",
-        "options": ["Task", "Constraints", "Examples", "Deadline"],
+        "id": "m1", "type": "mcq", "source": "Prompt Anatomy",
+        "question": "Two engineers ask for the same endpoint. Which prompt is far more likely to come back correct on the first try?",
+        "options": [
+            "\"Add an endpoint for orders.\"",
+            "\"Add an orders endpoint — you know what I mean, make it good.\"",
+            "\"Add orders. Use best practices and modern standards.\"",
+            "\"Add GET /api/orders in api/routes/orders.ts, following the pagination + auth pattern already in users.ts. Return 200 {orders: Order[], nextCursor}, 401 when unauthenticated. Don't touch the shared error middleware. Add a test alongside the existing route tests.\"",
+        ],
         "correct": 3, "points": 2,
     },
     {
-        "id": "m5", "type": "mcq", "source": "AI Dev Bible",
-        "question": "The 5-line spec block is made of which fields?",
-        "options": ["TASK / DATA / SERVICES / CONSTRAINTS / FORMAT", "GOAL / RISK / OWNER / DEADLINE / BUDGET",
-                    "WHO / WHAT / WHEN / WHERE / WHY", "TASK / TEST / TIME / TEAM / TOOLS"],
+        "id": "m2", "type": "mcq", "source": "Prompt Anatomy",
+        "question": "Which of these is NOT one of the parts of a strong engineering prompt?",
+        "options": [
+            "Task — the single change you want",
+            "Context — the files, patterns and data shapes it must fit",
+            "Constraints — what it must not touch or break",
+            "Deadline — when you need it by",
+        ],
+        "correct": 3, "points": 2,
+    },
+    {
+        "id": "m3", "type": "mcq", "source": "Prompt Anatomy",
+        "question": "What belongs in the ACCEPTANCE line of a prompt spec?",
+        "options": [
+            "The observable behaviour that proves it's done — inputs, outputs, UI states and error cases",
+            "A guess at how long the change will take",
+            "The name of the person who requested the ticket",
+            "A reminder to write clean code",
+        ],
         "correct": 0, "points": 2,
     },
     {
-        "id": "m6", "type": "mcq", "source": "AI Dev Bible",
-        "question": "Which command switches Claude Code into a mode where it proposes an approach but edits nothing until you approve?",
-        "options": ["/compact", "/clear", "/plan (or Shift+Tab)", "/init"],
+        "id": "m4", "type": "mcq", "source": "Prompt Anatomy",
+        "question": "\"Refactor the auth module, add role-based permissions, and redo the settings page\" in one prompt. What's the main cost?",
+        "options": [
+            "It uses more tokens than three separate prompts",
+            "Nothing — bigger prompts always produce better architecture",
+            "One giant diff that's hard to review, hard to test and impossible to bisect when something breaks — split it into separate prompts, each with its own verification",
+            "The model will refuse to answer prompts with three verbs",
+        ],
         "correct": 2, "points": 2,
     },
     {
-        "id": "m7", "type": "mcq", "source": "AI Dev Bible",
+        "id": "m5", "type": "mcq", "source": "Prompt Anatomy",
+        "question": "Which single constraint most reliably prevents an agent from breaking things you didn't ask it to touch?",
+        "options": [
+            "\"Be careful.\"",
+            "\"Write good code.\"",
+            "Naming what must NOT change — the public API shape, the DB schema, the passing tests, the shared components",
+            "\"Use TypeScript.\"",
+        ],
+        "correct": 2, "points": 2,
+    },
+    {
+        "id": "m6", "type": "mcq", "source": "Context & Conventions",
+        "question": "The model keeps inventing field names for an API your backend already defines. Fastest fix?",
+        "options": [
+            "Paste the real schema / type definition — or point at the exact file — so it works from the contract instead of guessing",
+            "Ask it to be more careful next time",
+            "Lower the temperature",
+            "Ask the same question again in a new session",
+        ],
+        "correct": 0, "points": 2,
+    },
+    {
+        "id": "m7", "type": "mcq", "source": "Context & Conventions",
+        "question": "What is CLAUDE.md for?",
+        "options": [
+            "A changelog of every past session",
+            "A list of banned commands",
+            "A file read automatically at the start of every session, so your stack, conventions, folder layout and test/lint commands never have to be retyped",
+            "The project's README for end users",
+        ],
+        "correct": 2, "points": 2,
+    },
+    {
+        "id": "m8", "type": "mcq", "source": "Context & Conventions",
+        "question": "Your app has a design-system <Button>, but the agent keeps hand-rolling new styled buttons. What instruction stops the duplication?",
+        "options": [
+            "\"Don't write CSS.\"",
+            "\"Make the button look nicer.\"",
+            "\"Use fewer files.\"",
+            "\"Before building any UI, search the codebase for an existing component or util that already does this and reuse or extend it — only create something new if nothing fits, and say why.\"",
+        ],
+        "correct": 3, "points": 2,
+    },
+    {
+        "id": "m9", "type": "mcq", "source": "Context & Conventions",
         "question": "You're deep into the same ticket and the context bar is climbing. You then need to switch to a totally unrelated task. What's the right sequence?",
-        "options": ["/clear now, then /compact later",
-                    "/compact for the climbing context on the same ticket, /clear when you switch to the unrelated task",
-                    "/init both times", "Neither — just keep going, context never needs managing"],
+        "options": [
+            "/clear now, then /compact later",
+            "/compact for the climbing context on the same ticket, /clear when you switch to the unrelated task",
+            "/init both times",
+            "Neither — just keep going, context never needs managing",
+        ],
         "correct": 1, "points": 2,
     },
     {
-        "id": "m8", "type": "mcq", "source": "AI Dev Bible",
+        "id": "m10", "type": "mcq", "source": "Context & Conventions",
         "question": "The \"kill repetition\" rule says a retyped instruction belongs in a saved command or Skill once you've typed a version of it:",
-        "options": ["Once", "More than twice in a week", "Only if a teammate asks", "Every single session"],
+        "options": [
+            "Once",
+            "More than twice in a week",
+            "Only if a teammate asks",
+            "Every single session",
+        ],
         "correct": 1, "points": 2,
     },
     {
-        "id": "m9", "type": "mcq", "source": "AI Dev Bible",
-        "question": "In a Skill folder's progressive disclosure, what's loaded for every skill at session start, regardless of relevance?",
-        "options": ["The full SKILL.md body", "All reference docs and scripts in the folder",
-                    "Only the YAML frontmatter (name + description)", "Nothing until it's manually run"],
+        "id": "m11", "type": "mcq", "source": "Plan Before Edits",
+        "question": "Which command switches Claude Code into a mode where it proposes an approach but edits nothing until you approve?",
+        "options": [
+            "/compact",
+            "/clear",
+            "/plan (or Shift+Tab)",
+            "/init",
+        ],
         "correct": 2, "points": 2,
     },
     {
-        "id": "m10", "type": "mcq", "source": "AI Dev Bible",
+        "id": "m12", "type": "mcq", "source": "Plan Before Edits",
+        "question": "When is it worth spending an extra minute asking for two or three approaches with trade-offs before any code is written?",
+        "options": [
+            "When the change is hard to reverse — data model, auth, state management, API contracts, anything other code will be built on top of",
+            "On every change, including a one-line CSS tweak",
+            "Never — it just slows delivery down",
+            "Only when you personally don't know the language",
+        ],
+        "correct": 0, "points": 2,
+    },
+    {
+        "id": "m13", "type": "mcq", "source": "Plan Before Edits",
+        "question": "The ticket is under-specified and the agent starts coding anyway on guessed requirements. Which addition to your prompt prevents the wasted round-trip?",
+        "options": [
+            "\"Work faster.\"",
+            "\"Write more comments.\"",
+            "\"Use a bigger model.\"",
+            "\"Before writing any code, list your assumptions and any question whose answer would change the design.\"",
+        ],
+        "correct": 3, "points": 2,
+    },
+    {
+        "id": "m14", "type": "mcq", "source": "Debugging Prompts",
+        "question": "\"The page is broken, it won't load, please fix.\" What is most missing from this bug prompt?",
+        "options": [
+            "Politeness",
+            "The exact error text and stack trace, the steps that reproduce it, and what you expected to happen instead",
+            "The name of the framework's founder",
+            "A deadline",
+        ],
+        "correct": 1, "points": 2,
+    },
+    {
+        "id": "m15", "type": "mcq", "source": "Debugging Prompts",
+        "question": "A bug lands in your queue. What should the prompt ask for FIRST?",
+        "options": [
+            "A reliable reproduction, ideally a failing test — a fix you can't reproduce is a fix you can't verify",
+            "The patch, immediately — speed matters most",
+            "A rewrite of the whole module",
+            "A list of every file in the repo",
+        ],
+        "correct": 0, "points": 2,
+    },
+    {
+        "id": "m16", "type": "mcq", "source": "Debugging Prompts",
+        "question": "Why ask \"explain the root cause before you patch it\" instead of just \"fix it\"?",
+        "options": [
+            "It makes the response longer, which is always better",
+            "The model can't write code and explanations in the same reply",
+            "It reduces token cost",
+            "A patch aimed at the symptom often just relocates the bug; the cause tells you whether other call sites have the same defect",
+        ],
+        "correct": 3, "points": 2,
+    },
+    {
+        "id": "m17", "type": "mcq", "source": "Debugging Prompts",
+        "question": "Third failed attempt at the same bug, in a thread that's now enormous. Best next move?",
+        "options": [
+            "Start a fresh session with only the current code, the failing test and the real error — a thread full of wrong turns keeps steering toward them",
+            "Keep going in the same thread — it has the most context",
+            "Delete the failing test so CI is green",
+            "Ask the same question louder, in caps",
+        ],
+        "correct": 0, "points": 2,
+    },
+    {
+        "id": "m18", "type": "mcq", "source": "Verify, Don't Trust",
+        "question": "\"Ask for proof, not a claim\" after a feature that writes to the database should request:",
+        "options": [
+            "A confident one-line summary that it works",
+            "A screenshot of the code",
+            "The actual test command and its output, the row queried back for real, the real request/response, and any step that failed silently",
+            "Nothing — trust the agent's word",
+        ],
+        "correct": 2, "points": 2,
+    },
+    {
+        "id": "m19", "type": "mcq", "source": "Verify, Don't Trust",
+        "question": "The agent reports \"all tests pass\" but pasted no output. What's the correct response?",
+        "options": [
+            "Merge it — it said so",
+            "Re-run the prompt with different wording",
+            "Add more tests without checking the existing ones",
+            "Ask for the exact command it ran and its unedited output; an unverified claim is not evidence",
+        ],
+        "correct": 3, "points": 2,
+    },
+    {
+        "id": "m20", "type": "mcq", "source": "Verify, Don't Trust",
+        "question": "Which prompt pattern cuts repeat regressions the most on a bug fix?",
+        "options": [
+            "\"Write a failing test that reproduces this bug, show me it failing, then make it pass without weakening the assertions, and show the full suite green.\"",
+            "\"Fix it and don't break anything.\"",
+            "\"Fix it, then delete any test that turns red.\"",
+            "\"Fix it and add a comment explaining the fix.\"",
+        ],
+        "correct": 0, "points": 2,
+    },
+    {
+        "id": "m21", "type": "mcq", "source": "Verify, Don't Trust",
+        "question": "What counts as \"done\" for an agent-written UI change?",
+        "options": [
+            "The diff looks reasonable when you skim it",
+            "The app was actually run and the changed screen observed — the happy path plus loading, empty and error states, with a clean console",
+            "The agent said it followed best practices",
+            "It compiles",
+        ],
+        "correct": 1, "points": 2,
+    },
+    {
+        "id": "m22", "type": "mcq", "source": "Review & Regression",
         "question": "In the writer/reviewer pattern, what should you paste into the fresh review session?",
-        "options": ["The whole conversation history from the writing session", "Only the diff — no backstory",
-                    "A summary of what you think is wrong", "Nothing — just ask it to guess"],
+        "options": [
+            "The whole conversation history from the writing session",
+            "Only the diff — no backstory",
+            "A summary of what you think is wrong",
+            "Nothing — just ask it to guess",
+        ],
         "correct": 1, "points": 2,
     },
     {
-        "id": "m11", "type": "mcq", "source": "Claude Task Sheet",
-        "question": "After connecting a real connector (GitHub or Google Drive), what question proves it's working with live data?",
-        "options": ["\"What's the capital of France?\"", "\"What's currently open and waiting on my review?\"",
-                    "\"Write me a poem\"", "\"What model are you?\""],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m12", "type": "mcq", "source": "Claude Task Sheet",
-        "question": "Grounded strictly in \"Employees accrue 1 paid sick day per month during their first year, up to 12 days\" — how many sick days by month 3?",
-        "options": ["1", "2", "3", "12"],
-        "correct": 2, "points": 2,
-    },
-    {
-        "id": "m13", "type": "mcq", "source": "Claude Task Sheet",
-        "question": "You need a workflow that grades retrieved documents and, if none are relevant, rewrites the query and searches again. What's the deciding factor for reaching past a straight pipeline?",
-        "options": ["The number of documents", "The need to loop back / branch conditionally",
-                    "The size of the vector database", "Whether it's in Python or JavaScript"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m14", "type": "mcq", "source": "Claude Task Sheet",
-        "question": "\"Ask for proof, not a claim\" after a database-writing feature should include a request for:",
-        "options": ["A confident one-line summary that it works",
-                    "Actual test output, the row queried back for real, and any step that failed silently",
-                    "A screenshot of the code", "Nothing — trust the agent's word"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m15", "type": "mcq", "source": "Claude Task Sheet",
-        "question": "What does running a second task in its own git worktree actually buy you?",
-        "options": ["Faster internet",
-                    "A second, fully isolated Claude Code session with zero risk of touching the main session's edits",
-                    "Automatic code review", "A smaller context window"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m16", "type": "mcq", "source": "MCP, Connectors & Plugins",
-        "question": "Of the three doors into giving Claude a new tool, which one is \"one click, someone else already built and hosts it\"?",
-        "options": ["MCP", "Plugin", "Connector", "Skill"],
-        "correct": 2, "points": 2,
-    },
-    {
-        "id": "m17", "type": "mcq", "source": "MCP, Connectors & Plugins",
-        "question": "In a FastMCP server, what marks a plain Python function as a callable tool?",
-        "options": ["A docstring", "The @mcp.tool() decorator", "Naming it main()", "Putting it in a file called tool.py"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m18", "type": "mcq", "source": "MCP, Connectors & Plugins",
-        "question": "You renamed a tool's parameter but the running Claude Code session still fails with a schema mismatch. Why?",
-        "options": ["The tool schema is only fetched once, at connection time — you need to restart the session",
-                    "MCP servers can never be edited after creation", "The tool name changed",
-                    "Python doesn't allow renaming parameters"],
+        "id": "m23", "type": "mcq", "source": "Review & Regression",
+        "question": "Which review prompt produces the most actionable output?",
+        "options": [
+            "\"Review this diff for correctness, unhandled error paths, and regressions to existing callers. Rank findings by severity and, for each, give the failing input that triggers it.\"",
+            "\"Is this code good?\"",
+            "\"Any thoughts?\"",
+            "\"Rate this out of 10.\"",
+        ],
         "correct": 0, "points": 2,
     },
     {
-        "id": "m19", "type": "mcq", "source": "MCP, Connectors & Plugins",
-        "question": "In a PreToolUse hook script, which exit code actually blocks the tool call from running?",
-        "options": ["exit 0", "exit 1", "exit 2", "Any nonzero code except 2"],
+        "id": "m24", "type": "mcq", "source": "Web App Craft",
+        "question": "Which prompt habit most reduces the flood of \"it broke when…\" tickets after a UI ship?",
+        "options": [
+            "Asking for prettier animations",
+            "Asking the model to add more comments",
+            "Asking for fewer files",
+            "Specifying the non-happy paths up front — loading, empty, error, offline, slow network, and unauthorised — as part of the acceptance criteria",
+        ],
+        "correct": 3, "points": 2,
+    },
+    {
+        "id": "m25", "type": "mcq", "source": "Web App Craft",
+        "question": "\"Make the dashboard faster.\" How should you re-write it?",
+        "options": [
+            "\"Make the dashboard much faster, it's really important.\"",
+            "\"Rewrite the dashboard in a faster framework.\"",
+            "\"LCP is 4.2s on a mid-tier phone; target is under 2.5s. Profile first, tell me what actually dominates, then change only that — and show me the before/after numbers.\"",
+            "\"Add caching everywhere.\"",
+        ],
         "correct": 2, "points": 2,
-    },
-    {
-        "id": "m20", "type": "mcq", "source": "MCP, Connectors & Plugins",
-        "question": "Where does a PreToolUse hook get registered for a project?",
-        "options": [".claude/settings.json", "CLAUDE.md", "package.json", "A global system environment variable"],
-        "correct": 0, "points": 2,
-    },
-    {
-        "id": "m21", "type": "mcq", "source": "RAG, LangChain & LangGraph",
-        "question": "Chunks keep coming back mixing unrelated topics together, making retrieval imprecise. Are the chunks too big or too small, and what's the fix?",
-        "options": ["Too small — merge chunks together", "Too big — use a smaller, more structure-aware chunk size",
-                    "Just right — the vector database is broken", "Neither — this means the embedding model is broken"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m22", "type": "mcq", "source": "RAG, LangChain & LangGraph",
-        "question": "What does a text embedding actually represent?",
-        "options": ["A compressed copy of the raw text",
-                    "A numeric vector positioning the text's meaning in space, so similar meanings land near each other",
-                    "A hash used only for deduplication", "The exact keywords in the text"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m23", "type": "mcq", "source": "RAG, LangChain & LangGraph",
-        "question": "Why do production vector databases use Approximate Nearest Neighbor (ANN) search instead of brute-force comparison?",
-        "options": ["ANN is always 100% accurate, brute force isn't",
-                    "Brute force doesn't scale past a few thousand vectors; ANN trades a little accuracy for large speed gains at scale",
-                    "ANN is required by law for vector data", "Brute force only works with text, not vectors"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m24", "type": "mcq", "source": "RAG, LangChain & LangGraph",
-        "question": "You catch yourself writing if/else logic around a linear chain to decide what happens next. What's the signal telling you?",
-        "options": ["Switch to a bigger LLM", "Reach for LangGraph instead of a plain chain",
-                    "Add more vector database shards", "Increase the chunk size"],
-        "correct": 1, "points": 2,
-    },
-    {
-        "id": "m25", "type": "mcq", "source": "RAG, LangChain & LangGraph",
-        "question": "You need the model to know about a policy that changes weekly. Do you reach for fine-tuning or RAG, and why?",
-        "options": ["Fine-tuning — it's cheaper for fast-changing facts",
-                    "RAG — facts update instantly by adding a document, no retraining needed",
-                    "Neither works for changing facts", "Fine-tuning, because RAG can't cite sources"],
-        "correct": 1, "points": 2,
     },
 ]
-
 PRACTICALS = [
     {
-        "id": "p1", "type": "practical", "source": "AI Dev Bible / Claude Task Sheet",
-        "title": "Turn a Vague Ask Into a Tagged Prompt",
-        "prompt_given": 'In Claude, rewrite this using task, context, constraints, and format: '
-                         '"Can you add caching to the search endpoint, it\'s kind of slow, don\'t break the existing tests." '
-                         "Paste Claude's actual response below.",
-        "look_for": "A response clearly split into task / context / constraints / format sections, with nothing left "
-                    "for Claude to guess at.",
+        "id": "p1", "type": "practical", "source": "Prompt Anatomy",
+        "title": "Turn a Vague Ticket Into a Specced Prompt",
+        "prompt_given": "In Claude, rewrite this ticket as a prompt with TASK / CONTEXT / CONSTRAINTS / ACCEPTANCE / "
+                         "FORMAT lines: \"The checkout page is slow and sometimes double-charges people, please fix it.\" "
+                         "The ACCEPTANCE line must name observable behaviour (including the error and loading states), and "
+                         "CONSTRAINTS must name what may not change. Paste Claude's actual response below.",
+        "look_for": "Five labelled lines (TASK, CONTEXT, CONSTRAINTS, ACCEPTANCE, FORMAT), each specific to checkout "
+                    "latency and double-charging. ACCEPTANCE must state checkable behaviour — e.g. a repeat submit "
+                    "produces exactly one charge, plus loading/error states — not vague goals like 'make it fast'. "
+                    "CONSTRAINTS must name concrete off-limits surfaces (payment provider contract, existing tests, DB "
+                    "schema). Nothing important left for Claude to guess.",
         "max_score": 10,
     },
     {
-        "id": "p2", "type": "practical", "source": "AI Dev Bible / Claude Task Sheet",
-        "title": "Fill a 5-Line Spec Block",
-        "prompt_given": "In Claude, write a TASK / DATA / SERVICES / CONSTRAINTS / FORMAT block for: when a user cancels "
-                         "a subscription, write a row to a cancellations table and call the billing provider's refund API "
-                         "for partial-month refunds. Paste the actual response below.",
-        "look_for": "Five short labeled lines (TASK, DATA, SERVICES, CONSTRAINTS, FORMAT), each substantive and specific "
-                    "to the cancellation/refund scenario.",
+        "id": "p2", "type": "practical", "source": "Plan Before Edits",
+        "title": "Plan Mode on a Real Feature",
+        "prompt_given": "Pick a real feature you actually need in your web app. In Claude Code, enter plan mode "
+                         "(Shift+Tab or /plan) and ask for two viable approaches with trade-offs, the exact files each "
+                         "would touch, the riskiest step, and how you'd roll it back — with NO edits made. Paste the "
+                         "actual plan, and one line on which approach you picked and why.",
+        "look_for": "A real plan produced with no code written: two distinct approaches with honest trade-offs, named "
+                    "files/paths from an actual codebase, an explicit riskiest step and a rollback path, plus the "
+                    "employee's own pick and reasoning. Generic advice with no real file names, or a plan that already "
+                    "contains applied edits, scores low.",
         "max_score": 10,
     },
     {
-        "id": "p3", "type": "practical", "source": "MCP, Connectors & Plugins",
-        "title": "Write and Run a Five-Line MCP Tool",
-        "prompt_given": "Write a FastMCP server exposing a search_orders(status) tool, run python3 server.py to confirm "
-                         "it starts without a traceback, then register it with claude mcp add and call it from a Claude "
-                         "Code session. Paste the actual server.py code AND the transcript line showing the real tool call.",
-        "look_for": "Working server.py code using @mcp.tool() and mcp.run(transport=\"stdio\"), plus evidence of a real "
-                    "tool call appearing in the Claude Code transcript — not just the code with no proof it ran.",
+        "id": "p3", "type": "practical", "source": "Debugging Prompts",
+        "title": "Reproduce Before You Fix",
+        "prompt_given": "Take a real bug in your project. Prompt Claude with the exact error text, the repro steps and "
+                         "the expected behaviour, and ask it to (1) write a failing test that reproduces the bug, (2) "
+                         "explain the root cause, (3) only then fix it without weakening the test. Paste the failing test "
+                         "output, the root-cause explanation, and the passing output after the fix.",
+        "look_for": "Evidence of the real sequence: a genuine failing test run (red output), a root-cause explanation "
+                    "that names the actual defect rather than restating the symptom, and a subsequent passing run. A fix "
+                    "with no failing-test-first evidence, or output that looks asserted rather than pasted, scores low.",
         "max_score": 10,
     },
     {
-        "id": "p4", "type": "practical", "source": "RAG, LangChain & LangGraph / Claude Task Sheet",
-        "title": "Decide: One Path, or a Loop?",
-        "prompt_given": "Ask Claude: I need a workflow that grades retrieved documents and, if none are relevant, "
-                         "rewrites the query and searches again. Would a straight pipeline handle this, or do I need "
-                         "something that can loop back a step — and what would you actually reach for? Paste the actual response.",
-        "look_for": "A recommendation that explicitly names looping/conditional branching (e.g. LangGraph or an "
-                    "equivalent graph-based orchestrator) as the deciding factor, not a plain linear pipeline.",
+        "id": "p4", "type": "practical", "source": "Review & Regression",
+        "title": "Reviewer Pass on Your Own Diff",
+        "prompt_given": "Open a FRESH Claude session and paste only your current diff (git diff) — no backstory. Ask: "
+                         "\"Review this diff for correctness, unhandled error paths and regressions to existing callers. "
+                         "Rank findings by severity and give the failing input that triggers each one.\" Paste the "
+                         "findings, then note which ones you actually fixed and which you consciously dismissed.",
+        "look_for": "A real diff was reviewed in a clean session: severity-ranked findings tied to concrete inputs or "
+                    "call sites, plus the employee's own triage of what was fixed vs dismissed and why. Generic review "
+                    "checklists with no reference to actual changed code score low.",
         "max_score": 10,
     },
     {
-        "id": "p5", "type": "practical", "source": "AI Dev Bible",
+        "id": "p5", "type": "practical", "source": "Verify, Don't Trust",
         "title": "Ask for Proof, Not a Claim",
-        "prompt_given": "On any real feature you're working on that involves a database write or external call, append: "
-                         "\"When done, show me: 1) the actual test output, 2) the row it wrote, queried back for real, "
-                         "3) any step that failed silently.\" Paste Claude's actual evidence-backed response below.",
-        "look_for": "Real, checkable output was returned — actual test output and a real queried-back row — not just "
-                    "an assertion that something works.",
+        "prompt_given": "On a real change that writes to a database or calls an external service, append to your prompt: "
+                         "\"When done, show me: 1) the exact test command and its unedited output, 2) the row it wrote, "
+                         "queried back for real, 3) the actual request/response, 4) any step that failed silently.\" "
+                         "Paste Claude's actual evidence-backed response below.",
+        "look_for": "Real, checkable output — an actual command with its output, a genuinely queried-back row or real "
+                    "request/response — not an assertion that it works. Bonus credit if a silently failing step was "
+                    "surfaced and dealt with.",
         "max_score": 10,
     },
 ]
@@ -277,10 +390,15 @@ def _client() -> OpenAI:
 
 
 GRADER_SYSTEM_PROMPT = (
-    "You are a strict but fair technical trainer grading how an employee used Claude / Claude Code "
-    "for a specific hands-on task. You will be given the task instructions, the criteria the trainer "
-    "is looking for, and the employee's pasted output (their transcript, notes, or result). "
+    "You are a strict but fair engineering trainer grading how well an employee PROMPTED Claude / Claude Code "
+    "while building or fixing a real web app. The skill being tested is prompting that ships working software "
+    "faster with fewer bugs and fewer follow-up fixes: specific asks, real context, explicit constraints, "
+    "checkable acceptance criteria, planning before edits, reproducing before fixing, and demanding evidence "
+    "instead of accepting claims. You will be given the task instructions, the criteria the trainer is looking "
+    "for, and the employee's pasted output (their transcript, notes, or result). "
     "Score ONLY what is shown — do not assume steps happened if they weren't described or pasted. "
+    "Reward pasted evidence from a real codebase (real file paths, real command output, real errors); "
+    "mark down generic textbook answers that could have been written without touching any project. "
     "Respond with STRICT JSON only, no markdown, in this exact shape: "
     '{"score": <integer 0-10>, "feedback": "<one or two sentence, specific, constructive feedback>"}'
 )
@@ -483,13 +601,16 @@ def aggregate(state: ExamState) -> ExamState:
     state["percentage"] = round(100 * total / GRAND_TOTAL, 1) if GRAND_TOTAL else 0.0
 
     if state["percentage"] >= 85:
-        verdict = "Certified — strong grasp across prompting, MCP, and RAG orchestration."
+        verdict = ("Certified — prompts are specific, constrained and evidence-backed. This is the habit set that "
+                   "ships web app work fast and keeps it from coming back as bugs.")
     elif state["percentage"] >= 70:
-        verdict = "Passed — solid grasp, a few areas worth revisiting."
+        verdict = "Passed — solid prompting habits, a few areas worth tightening (check the per-question feedback)."
     elif state["percentage"] >= 50:
-        verdict = "Borderline — review the missed sections and retake."
+        verdict = ("Borderline — the basics are there, but too much is still being left for the model to guess. "
+                   "Review the missed sections and retake.")
     else:
-        verdict = "Not yet passing — recommend re-reading the source material and retaking."
+        verdict = ("Not yet passing — prompts are still under-specified and under-verified. Re-read the source "
+                   "material on spec, constraints, and proof-over-claims, then retake.")
     state["overall_feedback"] = verdict
     return state
 
@@ -537,7 +658,7 @@ INDEX_HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claude & Claude Code — Certification Exam</title>
+<title>Prompting for Faster, Less Buggy Web Apps — Certification Exam</title>
 <style>
   :root{
     --ink:#1b1f23; --paper:#eef0ec; --card:#ffffff; --rule:#d7dcd3;
@@ -638,11 +759,15 @@ INDEX_HTML = """<!DOCTYPE html>
 </div>
 
 <header>
-  <p class="eyebrow">45-Minute Certification Exam · Self-Scored</p>
-  <h1>Claude &amp; Claude Code — Certification</h1>
-  <p>25 multiple-choice questions (auto-scored instantly) plus 5 hands-on tasks (graded from what you actually
-     pasted). You have 45 minutes. Submit once at the bottom — your score, per-question feedback, and the
-     correct answers are shown immediately, and everything is logged to the team sheet.</p>
+  <p class="eyebrow">45-Minute Certification Exam · Software Engineering</p>
+  <h1>Prompting for Faster, Less Buggy Web Apps</h1>
+  <p>Every question here is about one thing: prompting Claude so web app work ships faster and comes back as
+     bugs less often — specific asks, real context, explicit constraints, checkable acceptance criteria,
+     planning before edits, reproducing before fixing, and proof instead of claims.
+     25 multiple-choice questions (auto-scored instantly) plus 5 hands-on tasks you do for real in your own
+     project (graded from what you actually pasted). You have 45 minutes. Submit once at the bottom — your
+     score, per-question feedback, and the correct answers are shown immediately, and everything is logged to
+     the team sheet.</p>
 </header>
 
 <main>
