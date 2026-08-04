@@ -1,6 +1,6 @@
-# Prompting for Faster, Less Buggy Web Apps — Certification Exam
+# Prompting for Faster, Less Buggy Web Apps — Exam
 
-A 45-minute, self-scored certification for engineers. Every question is about one skill:
+A 45-minute, self-scored exam for engineers. Every question is about one skill:
 **prompting Claude / Claude Code so web app work ships faster and comes back as bugs less often.**
 
 Employees open a live URL, enter name + email, answer 25 multiple-choice questions and do
@@ -65,7 +65,7 @@ are derived from the submission itself, so changing the number of hands-on tasks
 ```bash
 git init
 git add .
-git commit -m "Prompting certification exam"
+git commit -m "Prompting exam"
 # create an empty repo on github.com, then:
 git remote add origin <url> && git push -u origin main
 ```
